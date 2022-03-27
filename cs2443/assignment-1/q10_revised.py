@@ -1,3 +1,13 @@
+class treeNode:
+    def __init__(self, value):
+        self.val = value
+        self.children = []
+        self.parent = None
+    def addChild(self, child):
+        child = treeNode(child)
+        self.children.append(child)
+        child.parent = self
+
 class graph:
     def __init__(self, vertices: int) :
         self.V = vertices
@@ -9,44 +19,45 @@ class graph:
         # edge from v to u
         self.E[v].append(u)
 
-g = graph(5)
-g.addEdge(1, 0)
-g.addEdge(1, 2)
-g.addEdge(3, 4)
-g.addEdge(3, 2)
-g.addEdge(1, 4)
+g = graph(7)
+g.addEdge(0,2)
+g.addEdge(1,2)
+g.addEdge(4,2)
+g.addEdge(3,2)
+g.addEdge(5,2)
+g.addEdge(3,4)
+g.addEdge(1,6)
 
-#
-#    0---1---4
-#        |   |
-#        2---3
-#
-#
-    
-# what are we doing here
-# like dfs, we will maintain a stack
-# when a node is poped out, if it was already visited, then do nothing
-# else add all its neighbours that haven't been visited
-# for the neighbours that have already been visited, 
-# it means that there could be some cycle,
-# so, we will check if the parent of v is actually not vertex, then 
-# cycle exists
-def cycle_util(g : graph, start : int) :
-    stack = [start]
-    dfsTree = []
-    visited = [False] * g.V 
-    parent = [-1] * g.V
+
+unseen = {range(g.V)}
+
+def isCycle(g: graph, start: int):
+    root = treeNode(start)
+    visited = [False] * g.V
+    stack = [root]
     while stack:
-        v = stack.pop()
-        if visited[v]: continue
-        visited[v] = True
-        dfsTree.append(v)
-        for vertex in g.E[v]:
-            if not visited[vertex]:
-                stack.append(vertex)
-                parent[vertex] = v
-            else :
-                if parent[v] != vertex:
-                    return dfsTree[dfsTree.index(vertex):]
-    return 
-print(cycle_util(g, 0))
+        node = stack.pop()
+        if not visited[node.val]:
+            visited[node.val] = True
+            if node.parent:
+                node.parent.children.append(node)
+            for edge in g.E[node.val]:
+                if not visited[edge]:
+                    edge = treeNode(edge)
+                    edge.parent = node
+                    stack.append(edge)
+                else:
+                    if edge != node.parent.val:
+                        cycle = []
+                        while node.parent.val != edge:
+                            cycle.append(node.val)
+                            node = node.parent
+                        cycle.append(node.val)
+                        cycle.append(edge)
+                        return cycle
+
+
+
+
+print(isCycle(g,0))
+            
