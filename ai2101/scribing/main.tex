@@ -1,0 +1,205 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% How to use writeLaTeX: 
+%
+% You edit the source code here on the left, and the preview on the
+% right shows you the result within a few seconds.
+%
+% Bookmark this page and share the URL with your co-authors. They can
+% edit at the same time!
+%
+% You can upload figures, bibliographies, custom classes and
+% styles using the files menu.
+%
+% If you're new to LaTeX, the wikibook is a great place to start:
+% http://en.wikibooks.org/wiki/LaTeX
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass{tufte-handout}
+%\usepackage{thmtools}
+
+%\geometry{showframe}% for debugging purposes -- displays the margins
+
+\usepackage{amsmath}
+
+% Set up the images/graphics package
+\usepackage{graphicx}
+\setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+\graphicspath{{graphics/}}
+
+\title[Lecture 9]{\large AI2101/EE5606 Convex Optimization \\ \LARGE Lecture 9}
+\author[Chirag Mehta]{Scribe(s): AI20BTECH11006, Chirag Mehta}
+\date{\today}  % if the \date{} command is left out, the current date will be used
+
+% The following package makes prettier tables.  We're all about the bling!
+\usepackage{booktabs}
+\usepackage{amsmath, amsthm, amssymb, bm}
+\usepackage{tikz, pgfplots}
+\usetikzlibrary{shapes, arrows, positioning, fit, calc}   
+\tikzset{block/.style={draw, thick, text width=1.2cm ,minimum height=0.8cm, align=center},   
+line/.style={-latex}     
+} 
+
+\newtheorem{theorem}{Theorem}
+\theoremstyle{remark}
+\newtheorem*{defn}{Definition}
+\renewcommand{\vec}[1]{\underline{#1}}
+% The units package provides nice, non-stacked fractions and better spacing
+% for units.
+\usepackage{units}
+
+% The fancyvrb package lets us customize the formatting of verbatim
+% environments.  We use a slightly smaller font.
+\usepackage{fancyvrb}
+\fvset{fontsize=\normalsize}
+
+% Small sections of multiple columns
+\usepackage{multicol}
+
+% Provides paragraphs of dummy text
+\usepackage{lipsum}
+
+% These commands are used to pretty-print LaTeX commands
+\newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}% (required) command argument
+\newenvironment{docspec}{\begin{quote}\noindent}{\end{quote}}% command specification environment
+\newcommand{\docenv}[1]{\textsf{#1}}% environment name
+\newcommand{\docpkg}[1]{\texttt{#1}}% package name
+\newcommand{\doccls}[1]{\texttt{#1}}% document class name
+\newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
+\newcommand\norm[1]{\ensuremath{\lVert#1\rVert}}
+\newcommand\abs[1]{\ensuremath{\Vert#1\Vert}}
+\newcommand\twospace{\,\,}
+\begin{document}
+
+\maketitle
+\fancyhead[L]{AI2101/EE5606}
+
+% Consider this for later
+%\newthought{Recall:} vector spaces, matrix multiplication, linear independence
+
+
+\section{Quadratic Problems}
+A convex quadratic program is just a least squares problem with linear constraints. Consider the following formulation
+\begin{align}
+    \begin{split}
+        \min_{\vec{x}}\, &\twospace\vec{x}^TQ\vec{x} + \vec{c}^T\vec{x}
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & C\vec{x} \leq \vec{d}
+\end{align}
+
+\newthought{Recall:} Every positive definite matrix is a gram matrix\\
+We can write
+\begin{align}
+    \exists R \twospace : \twospace Q = R^TR
+\end{align}
+
+We can rewrite our optimization problem as
+\begin{align}
+    \begin{split}
+        \min_{\vec{x}}\, &\vec{x}^TR^TR\vec{x} + \vec{c}^T\vec{x}
+    \end{split} \label{eq:build}\\ 
+    \text{s.t:}
+    \twospace & C\vec{x} \leq \vec{d}
+\end{align}
+Further, we can write
+\begin{align}\exists \vec{b}\twospace : \twospace \vec{c} = 2R^T\vec{b} \label{eq:c_eq_RTb}\end{align}
+\sidenote{since $R^T$ is a full rank matrix, a unique solution must exist for the above system of equations.} Further, we can rewrite the optimization problem as a least square problems using \eqref{eq:build} and \eqref{eq:c_eq_RTb}
+
+\begin{align}
+    \begin{split}
+        \min_{\vec{x}}\, &\twospace\norm{R\vec{x}-\vec{b}}^2-\vec{b}^T\vec{b}
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & C\vec{x} \leq \vec{d}\\
+    & \vec{c} = 2R^T\vec{b} \nonumber
+\end{align}
+% polyhedra distance problem
+\textbf{Problem:} Given two polyhedra, determine the distance between them.
+\begin{align}
+    P_1:\twospace A\vec{x}\leq\vec{b}\\
+    P_2:\twospace C\vec{x}\leq\vec{d}
+\end{align}
+The optimization problem can be formulated as follows
+\begin{align}
+    \begin{split}
+        \min_{\vec{x_1},\vec{x_2}}\, &\twospace\norm{\vec{x_1}-\vec{x_2}}
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & \vec{x_1} \in P_1\\
+    & \vec{x_2} \in P_2 \nonumber
+\end{align}
+The above is a quadratic problem with linear constraints, next we will look at a Quadratically Constrained Quadratic Programs (QCQP)
+\begin{align}
+    \begin{split}
+        \min_{\vec{x}}\, &\vec{x}^TQ\vec{x}+\vec{b}^T\vec{x}
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & \vec{x}^TQ_i\vec{x}+\vec{b_i}^T\vec{x}\leq c_i\\
+    & C\vec{x}\leq\vec{d} \nonumber
+\end{align}
+
+\textbf{Example: Portfolio optimization}
+\begin{align}
+    \begin{split}
+        \min_{\vec{x}}\, &\twospace\vec{x}^T\Sigma\vec{x}-\lambda\vec{\mu}^T\vec{x}
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & \vec{x}^T\vec{1} = 1\\
+    & \vec{x}\geq 0 \nonumber
+\end{align}
+where $\Sigma$ is the covariance matrix that accounts for the risk.
+\footnote{if $\lambda$ is small then we are taking low risk, $\lambda$ controls the risk against expected returns.}
+The above problem is a quadratic program since the objective is quadratic, while the constraints are linear.
+
+\textbf{Example: Linear Discriminator}
+Lets say we have a dataset of two classes
+\begin{align}
+    C1:\twospace \{x_1,x2,\dots,x_m\}\nonumber\\
+    C2:\twospace \{y_1,y2,\dots,y_m\}\nonumber
+\end{align}
+Check whether the given datapoints are linearly separable.\\
+\textit{Initial Thought:} Check if the convex hulls of the given datapoints intersect, if yes, then the classes are not linearly separable.\sidenote{Note that this problem is a feasibility problem.}\\
+\textit{Another method:} Consider the following two inequalities for respective classes
+\begin{align}
+    C1:\twospace \vec{a}^T\vec{x_i}-b\geq 1 \\
+    C2:\twospace \vec{a}^T\vec{y_i}-b\leq -1 \nonumber
+\end{align}
+We can frame our feasibility problem as
+\begin{align}
+    \begin{split}
+        \min_{\vec{a},b}\, &\twospace 0
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & \vec{a}^T\vec{x_i}-b\geq1 \twospace ,\, i= 1,2,\dots,m\\
+    & \vec{a}^T\vec{y_i}-b\leq-1 \twospace ,\, i= 1,2,\dots,m \nonumber
+\end{align}
+\sidenote{The reason why we choose 1 instead of 0 in the inequality is because of inequalities are treated the same way as equalities is cvxpy solver, the problem will then always be feasible by choose $a$ as zero vector, and $b$ to be 0}
+Both the listed methods are equivalent.\\
+Further, we can extend the problem from a feasibility problem to hard margin support vector machine.
+\begin{align}
+    \begin{split}
+        \min_{\vec{a},b}\, &\twospace\norm{\vec{a}}^2
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & \vec{a}^T\vec{x_i}-b \geq 1 \twospace ,\, i= 1,2,\dots,m\\
+    & \vec{a}^T\vec{y_i}-b \leq -1 \twospace ,\, i= 1,2,\dots,m \nonumber
+\end{align}
+This is a quadratic program (QP), we can however, reformulate this problem as follows
+\begin{align}
+    \begin{split}
+        \min_{\vec{a},b,t}\, &\twospace t
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & \vec{a}^T\vec{x_i}-b \geq t \twospace ,\, i= 1,2,\dots,m\\
+    & \vec{a}^T\vec{y_i}-b \leq -t \twospace ,\, i= 1,2,\dots,m \nonumber\\
+    & \norm{\vec{a}}\leq 1 \nonumber
+\end{align}
+The above formulation in Quadratically Constrained Quadratic Program (QCQP).  \sidenote{Since the margin in our latter problem is $\frac{2t}{\norm{a}}$, but we are maximizing $t$, then we would get $\norm{a}=1$}\\
+\textbf{Assertion:} The above two problems are equivalent. Solving one would also solve the other, we can arrive at solution for latter from the prior formulation\\
+Lets say after solving the prior, we get $\vec{a'},\, b'$ as the optimal solution, we can divide both $\vec{a'},\, b'$ by $\norm{\vec{a'}}$, to get the solution to our latter formulation.
+
+
+
+\end{document}
