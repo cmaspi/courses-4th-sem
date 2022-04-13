@@ -1,4 +1,13 @@
-import typing as ty
+class treeNode:
+    def __init__(self, value):
+        self.val = value
+        self.children = []
+        self.parent = None
+    def addChild(self, child):
+        child = treeNode(child)
+        self.children.append(child)
+        child.parent = self
+
 class graph:
     def __init__(self, vertices: int) :
         self.V = vertices
@@ -20,46 +29,37 @@ g.addEdge(3,4)
 g.addEdge(1,6)
 
 
+unseen = {*tuple(range(g.V))}
 
-    
-# what are we doing here
-# like dfs, we will maintain a stack
-# when a node is poped out, if it was already visited, then do nothing
-# else add all its neighbours that haven't been visited
-# for the neighbours that have already been visited, 
-# it means that there could be some cycle,
-# so, we will check if the parent of v is actually not vertex, then 
-# cycle exists
-
-seen = {*tuple(range(g.V))}
-
-def cycle_util(g : graph, start : int):
-    global seen
-    stack = [start]
-    dfsTree = []
-    visited = [False] * g.V 
-    parent = [-1] * g.V
+def isCycle(g: graph, start: int):
+    root = treeNode(start)
+    # visited = [False] * g.V
+    global unseen
+    stack = [root]
     while stack:
-        v = stack.pop()
-        if visited[v]: continue
-        visited[v] = True
-        seen.remove(v)
-        dfsTree.append(v)
-        for vertex in g.E[v]:
-            if not visited[vertex]:
-                stack.append(vertex)
-                parent[vertex] = v
-            else :
-                if parent[v] != vertex:
-                    return dfsTree[dfsTree.index(vertex):], None
-    return None, visited
+        node = stack.pop()
+        if node.val in unseen:
+            unseen.remove(node.val)
+            if node.parent:
+                node.parent.children.append(node)
+            for edge in g.E[node.val]:
+                if edge in unseen:
+                    edge = treeNode(edge)
+                    edge.parent = node
+                    stack.append(edge)
+                else:
+                    if edge != node.parent.val:
+                        cycle = []
+                        while node.parent.val != edge:
+                            cycle.append(node.val)
+                            node = node.parent
+                        cycle.append(node.val)
+                        cycle.append(edge)
+                        return cycle
 
-while seen:
-    for i in seen: break
-    a, b = cycle_util(g, i)
-    if a:
-        print(a)
+while unseen:
+    for start in unseen: break
+    cycle = isCycle(g, start)
+    if cycle:
+        print(cycle)
         break
-    else:
-        visited = [ i or j for i,j in zip(b, visited)]
-
