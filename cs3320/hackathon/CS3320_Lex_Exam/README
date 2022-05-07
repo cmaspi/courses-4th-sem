@@ -1,0 +1,23 @@
+Roll No.: AI20BTECH11006
+Name: Chirag Mehta
+
+--------------------------------------------------------------------------------
+
+P1: Chess
+---------
+Assumptions / Comments (if any):
+All the inputs are correct.	
+# Is the program complete? Are there any assumptions made? Any other comments?
+Yes, the program is complete.
+Approach : So, we will consider two cases, when promotion is not involved, and other being when it is involved at least once. We will iterate over characters in yytext, and we will find the starting position using what comes before -, end position using what comes after -. We will repeat this for black pieces. Cut move, doesn't require anything special and can be dealt in the same way as just moving to empty spot as we are just overwriting that spot. For promotion however, we will store the required promotion piece, and then overwrite it with that piece.
+# How do you solve this problem?
+I solved this problem regex in lex, making two separate cases for move and promote, this allowed me to write two functions move and promote, which are largely similar except for the promotion part. I wrote a print function that prints the board in required manner.
+
+P2: Calculator
+--------------
+Assumptions / Comments (if any):
+	
+# Is the program complete? Are there any assumptions made? Any other comments?
+Yes, the program is complete. I'm assuming there are not nested for loops, we would only declare variables of type int. The variable name can vary from "input"
+Approach : I've written several regex to identify different types of expressions. I've written functions associated with them to do the printing a c file.
+# How do you solve this problem?

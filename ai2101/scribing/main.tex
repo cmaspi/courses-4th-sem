@@ -1,3 +1,4 @@
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % How to use writeLaTeX: 
 %
@@ -67,7 +68,7 @@ line/.style={-latex}
 \newcommand{\docpkg}[1]{\texttt{#1}}% package name
 \newcommand{\doccls}[1]{\texttt{#1}}% document class name
 \newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
-\newcommand\norm[1]{\ensuremath{\lVert#1\rVert}}
+\newcommand\norm[1]{\ensuremath{\lVert#1\rVert_2}}
 \newcommand\abs[1]{\ensuremath{\Vert#1\Vert}}
 \newcommand\twospace{\,\,}
 \begin{document}
@@ -105,7 +106,7 @@ We can rewrite our optimization problem as
 \end{align}
 Further, we can write
 \begin{align}\exists \vec{b}\twospace : \twospace \vec{c} = 2R^T\vec{b} \label{eq:c_eq_RTb}\end{align}
-\sidenote{since $R^T$ is a full rank matrix, a unique solution must exist for the above system of equations.} Further, we can rewrite the optimization problem as a least square problems using \eqref{eq:build} and \eqref{eq:c_eq_RTb}
+\sidenote{since $R^T$ is a full rank matrix, a unique solution must exist for the above system of equations.} Now, we can rewrite the optimization problem as a least square problems using \eqref{eq:build} and \eqref{eq:c_eq_RTb}
 
 \begin{align}
     \begin{split}
@@ -156,15 +157,15 @@ The above problem is a quadratic program since the objective is quadratic, while
 \textbf{Example: Linear Discriminator}
 Lets say we have a dataset of two classes
 \begin{align}
-    C1:\twospace \{x_1,x2,\dots,x_m\}\nonumber\\
-    C2:\twospace \{y_1,y2,\dots,y_m\}\nonumber
+    &C1:\twospace \{x_1,x2,\dots,x_m\}\nonumber\\
+    &C2:\twospace \{y_1,y2,\dots,y_m\}\nonumber
 \end{align}
 Check whether the given datapoints are linearly separable.\\
 \textit{Initial Thought:} Check if the convex hulls of the given datapoints intersect, if yes, then the classes are not linearly separable.\sidenote{Note that this problem is a feasibility problem.}\\
 \textit{Another method:} Consider the following two inequalities for respective classes
 \begin{align}
-    C1:\twospace \vec{a}^T\vec{x_i}-b\geq 1 \\
-    C2:\twospace \vec{a}^T\vec{y_i}-b\leq -1 \nonumber
+    &C1:\twospace \vec{a}^T\vec{x_i}-b\geq 1 \\
+    &C2:\twospace \vec{a}^T\vec{y_i}-b\leq -1 \nonumber
 \end{align}
 We can frame our feasibility problem as
 \begin{align}
@@ -200,6 +201,133 @@ The above formulation in Quadratically Constrained Quadratic Program (QCQP).  \s
 \textbf{Assertion:} The above two problems are equivalent. Solving one would also solve the other, we can arrive at solution for latter from the prior formulation\\
 Lets say after solving the prior, we get $\vec{a'},\, b'$ as the optimal solution, we can divide both $\vec{a'},\, b'$ by $\norm{\vec{a'}}$, to get the solution to our latter formulation.
 
+\section{Second Order Cone Prgrams}
+A second order cone can be represented as follows
+\begin{align}
+    \{\left(\vec{x},t\right):\twospace\norm{\vec{x}}\leq t\}
+\end{align}
+We can take another example
+\begin{align}
+    \{\left(x,y\right):\twospace xy\geq 1\}
+\end{align}
+The above can be formulated as a cone in the following manner
+\begin{align}
+    \{\left(x,y\right):\twospace \left|\left|\begin{pmatrix}x-y\\2\end{pmatrix}\right|\right|_2\geq x+y\} \label{eq:socpnorm}
+\end{align}
+
+A general form of SOCP is given below
+\begin{align}
+    \begin{split}
+        \min_{\vec{x}}\, &\twospace \vec{e}^T\vec{x}
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & \norm{A_i\vec{x}+\vec{b_i}}\leq \vec{c_i}^T\vec{x}+d_i \twospace ,\, i= 1,2,\dots,m\\
+    & F\vec{x}=\vec{g} \nonumber
+\end{align}
+Consider the following problem
+
+\begin{align}
+    \begin{split}
+        \max_{\vec{x}}\, &\twospace \left( \frac{1}{\vec{a_1}^T\vec{x}+b_1} + \frac{1}{\vec{a_2}^T\vec{x}+b_2} + \dots + \frac{1}{\vec{a_m}^T\vec{x}+b_m} \right)^{-1}
+    \end{split}
+\end{align}
+We can reformulate this problem as a SOCP in the following manner
+\begin{align}
+    \begin{split}
+        \min_{\vec{t}}\, &\twospace t_1+t_2+\dots+t_m
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & t_i\left(\vec{a_i}^T\vec{x}+b_i\right)\geq 1 \twospace ,\, i= 1,2,\dots,m\\
+    & t_i\geq 0 \twospace ,\, i= 1,2,\dots,m\nonumber
+\end{align}
+\sidenote{We want $\vec{a_i}^T\vec{x}+b_i$ to be positive, so we impose non-negative condition on $t$ to implicitly use this constraint}
+The above problem is now a SOCP.\\
+Now, lets look at yet another problem which can be formulated as a SOCP
+\begin{align}
+    \begin{split}
+        \max_{\vec{y}}\, &\twospace \left(y_1,y_2\right)^{0.5}
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & \vec{y} = A\vec{x}+\vec{b}\\
+    & \vec{y}\geq 0 \nonumber
+\end{align}
+We can use the hypograh trick to convert this to a SOCP
+\begin{align}
+    \begin{split}
+        \max_{\vec{y},t}\, &\twospace t
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & \vec{y} = A\vec{x}+\vec{b}\\
+    & \vec{y}\geq 0 \nonumber\\
+    & \left|\left|\begin{pmatrix}y_1-y_2\\2t\end{pmatrix}\right|\right|_2\leq y_1+y_2 \nonumber\\
+    &t\geq 0\nonumber
+\end{align}
+
+We can generalise the above problem to a more broader problem, consider the following problem with $\vec{y}$ being a $4$ dimensional vector this time
+\begin{align}
+    \begin{split}
+        \max_{y_1,y_2}\, &\twospace \left(y_1y_2y_3y_4\right)^{0.25}
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & \vec{y} = A\vec{x}+\vec{b}\\
+    & \vec{y}\geq 0 \nonumber
+\end{align}
+
+Now, take $t_1^2 \leq y_1y_2$, $t_2^2 \leq y_3y_4$, $t^2\leq t_1t_2$. We can formulate the problem as
+
+\begin{align}
+    \begin{split}
+        \max_{\vec{y},t_1,t_2,t}\, &\twospace t
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & \vec{y} = A\vec{x}+\vec{b}\\
+    & y_1y_2\geq t_1^2 \nonumber\\
+    & y_3y_4\geq t_2^2 \nonumber\\    
+    & t_1t_2\geq t^2 \nonumber\\       
+    &t\geq 0, \twospace\vec{y}\geq 0 \nonumber\\
+    &t_1\geq 0,\twospace t_2\geq 0\nonumber
+\end{align}
+Further, using \eqref{eq:socpnorm}, we can represent the constraints as conic constraints. The above problem can be generalised further to $\vec{y}$ being a $2^n$ dimensional vector.
 
 
+\section{Robust Linear Programming}
+Consider the following problem
+\begin{align}
+    \begin{split}
+        \min_{\vec{x}}\, &\twospace \vec{c}^T\vec{x}
+    \end{split}\\ 
+    \text{s.t:}
+    \twospace & \vec{a_i}^T\vec{x} \leq b_i, \twospace i = 1,2,\dots, m
+\end{align}
+the catch is that there is uncertainity in $\vec{a_i}$\\
+We can take the following case
+\begin{align}
+    \vec{a_i} \sim \mathcal{N}(\vec{\mu_i}, \Sigma_i)
+\end{align}
+We want $\vec{a_i}^T\vec{x} \leq b_i$ to hold with a high probability, say
+\begin{align}
+    \text{P}(\vec{a_i}^T\vec{x} \leq b_i) \geq \eta
+\end{align}
+\sidenote{where $\eta$ is some number close to $1$ like $0.99$.}
+Now call $\vec{a_i}^T\vec{x}$ as $u_i$, we know that
+\begin{align}
+    \text{E}[u_i] &= \vec{\mu_i}^T\vec{x}\\
+    var(u_i) &= \sigma^2 =  \vec{x}^T\Sigma_i\vec{x} \label{eq:variance}
+\end{align}
+Now, we can rewrite our problem as 
+\begin{align}
+    \text{P}\left(\frac{u_i-\text{E}[u_i]}{\sigma} \leq \frac{b_i-\text{E}[u_i]}{\sigma}\right)
+\end{align}
+\sidenote{We used this transformation to write the equation in terms of $Z$ score}
+Using $Z$ score, we get 
+\begin{align}
+    \frac{b_i-\text{E}[u_i]}{\sigma} \geq Q^{-1}(\eta)
+\end{align}
+\sidenote{Here $Q^{-1}$ is a function that maps probabilities to $Z$ scores}
+using \eqref{eq:variance}
+\begin{align}
+    b_i-\text{E}[u_i] &\geq Q^{-1}(\eta) \left(\vec{x}^T\Sigma_i\vec{x}\right)^{0.5} \\
+    b_i-\text{E}[u_i] &\geq Q^{-1}(\eta) \norm{\Sigma \vec{x}}^{0.5} 
+\end{align} 
+the above problem is now a SOCP.
 \end{document}

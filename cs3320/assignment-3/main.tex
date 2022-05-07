@@ -1,0 +1,75 @@
+%--------------------
+% Packages
+% -------------------
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+%\usepackage{gentium}
+\usepackage{mathptmx} % Use Times Font
+
+
+\usepackage[pdftex]{graphicx} % Required for including pictures
+\usepackage[pdftex,linkcolor=black,pdfborder={0 0 0}]{hyperref} % Format links for pdf
+\usepackage{calc} % To reset the counter in the document after title page
+\usepackage{enumitem} % Includes lists
+
+\frenchspacing % No double spacing between sentences
+\linespread{1.2} % Set linespace
+\usepackage[a4paper, lmargin=0.1666\paperwidth, rmargin=0.1666\paperwidth, tmargin=0.1111\paperheight, bmargin=0.1111\paperheight]{geometry} %margins
+%\usepackage{parskip}
+
+\usepackage[all]{nowidow} % Tries to remove widows
+\usepackage[protrusion=true,expansion=true]{microtype} % Improves typography, load after fontpackage is selected
+
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+
+
+
+%-----------------------
+% Begin document
+%-----------------------
+\begin{document}
+\title{Mini Assignment-3}
+\author{Chirag Mehta : AI20BTECH11006 , Dishank Jain : AI20BTECH11011}
+
+\maketitle
+
+\section{Strange/Bizzare/Weird things about JavaScript:}
+\begin{itemize}
+    \item We can write regular expressions in JS. We have not seen this being done in other languages that we have used like C/C++/Python/Java.
+    \item The above can cause problem in block comments which use /* */ as these characters can appear in regular expressions.
+    \item JS does not have a character type. To represent a character, we need to make a string with just one character in it.
+    \item A variable declared in a block statement is accessible even outside the block if it defined using only var keyword. let keyword allows us  to limit the scope of variables to only the block.
+    \item All characters in JS are 16-bit unlike C/C++ where characters are 8-bit.
+    \item A statement need not end with a semi-colon except if it is a expression statement
+    \item null == 0
+        
+        The above returns false, while
+
+        null >= 0
+
+        This returns true. The reason being "==" only coerces null to undefined, which is why
+
+        null == undefined
+
+        Returns true, their type however would still be different and
+
+        null === undefined 
+
+        Still returns false
+    
+\end{itemize}
+
+\section{Good things about javascript}
+\begin{itemize}
+    \item Javascript uses a single number type, that is 64 bit integer. This helps avoid a large class of numeric type error such as integer overflow.
+    \item The for loop in JS can act as “for in”, which is an iterator over an iterable object. This is very similar to how the for loop acts in python.
+    \item We can define anonymous functions, that are functions that do not have a name. This is similar to lambda in python albeit lambda functions are supposed to be short.
+\end{itemize}
+
+\section{Observations about the transition diagrams}
+\begin{itemize}
+    \item We found the railroad diagrams used by the author redundant. More conventional state transition diagrams used to represent finite automata are good enough, we feel. Also, regular expressions are easy enough to understand.
+\end{itemize}
+
+\end{document}
